@@ -6,11 +6,13 @@
 #include <iostream>
 #include <utility>
 #include <string>
+#include <list>
 using namespace std;
 
 int main(int argc, char *argv[]) 
 {
-	vector<string> tokens;
+		srand(time(NULL));
+		list<string> tokens;
     set <string> unique;
     string next_line;  // Each data line
 		string filename = argv[1];
@@ -42,37 +44,74 @@ int main(int argc, char *argv[])
 		}
     cout << endl;
 
-// PART 2 print to _vector.txt 
-		ofstream vectorfile (filename + "_vector.txt");
-		for (int i = 0; i < tokens.size(); i++) {
-			vectorfile << tokens.at(i) << endl;
+// PART 2 print to list.txt 
+		ofstream listfile (filename + "_list.txt");
+		for (auto it = tokens.begin(); it != tokens.end(); ++it) {
+			listfile << *it << endl;
 		}
 
-// PART 3 map of strings to strings
+// PART 3, 5, and maybe 6 map of strings to vector
 
-		map<string, string> wordmap;
-		string last="";
-		for (vector<string>::iterator it = tokens.begin(); it!=tokens.end(); it++) {
-			wordmap[last]=*it;
-			last = *it;
-     	mapfile << wordmap[*it] << ", " << *it << endl; 
+
+ 	/*	map<string, vector<string>> wordmap;
+ 		string state = "";
+ 		for (auto it = tokens.begin(); it != tokens.end(); it++) {
+ 			wordmap[state].push_back(*it);
+ 			state = *it;
 		}
-		map<string, vector<string>> wordmap;
-		string state = "";
-		ofstream mapfile (filename + "_map.txt");
 
-		for(vector<string>::iterator it=tokens.begin(); it !=tokens.end(); it++) {
-			wordmap[state].push_back(*it);
-			state = *it;
+		
+//Part 4 print something cool
+		
+		//state = "";
+		// 
+		// for(int i = 0; i < 100; i++){
+		// 	int ind = rand() % wordmap[state].size();
+		// 	cout << wordmap[state][ind] << " ";
+		// 	state = wordmap[state][ind];
+		// }
+		// cout << endl;
+
+		
+	// 	}
+*/
+// Part 6
+const int M = 2;
+	map<list<string>, vector<string>> wordmap;
+  list<string> mlist;
+	list<string> startList;
+  for (int i = 0; i < M; i++) {
+    mlist.push_back("");
+		startList.push_back("");
+  }
+  int stop = rand() % (tokens.size() - M - 1);                   
+  for (auto it = tokens.begin(); it != tokens.end(); it++) {
+    wordmap[mlist].push_back(*it);
+    mlist.push_back(*it);
+    mlist.pop_front();
+		if (stop == wordmap.size()) {
+		startList.push_back(*it);
+    startList.pop_front();
 		}
-// Part 4 print something cool
+  }
 
-string state = "";
-for(int i = 0; i < 100; i++){
-  cout << wordmap[state] << " ";
-  state = wordmap[state];
-}
-cout << endl;
+	 ofstream mapfile(filename + "_map.txt");
+		
+	 for(auto it = mlist.begin(); it !=  mlist.end(); ++it) {
+   	mapfile << it->first << ": ";
+	 	 			for(auto possible:it->second) {
+	 	 			mapfile << possible << " ";
+	 	 			}
+	 	 			mapfile << endl;
+	 }
+	
+  for (int i = 0; i < 200; i++) {
+    int ind = rand() % wordmap[startList].size();
+    cout << wordmap[startList][ind]<<" ";
+    startList.push_back(wordmap[startList][ind]);
+    startList.pop_front();
+	
+  }
 
 return 0;
 }
